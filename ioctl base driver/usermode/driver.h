@@ -5,10 +5,11 @@
 #include <cstdint>
 uintptr_t virtualaddy;
 
-#define code_rw CTL_CODE(FILE_DEVICE_UNKNOWN, 0x71, METHOD_BUFFERED, FILE_SPECIAL_ACCESS)
-#define code_ba CTL_CODE(FILE_DEVICE_UNKNOWN, 0x72, METHOD_BUFFERED, FILE_SPECIAL_ACCESS)
-#define code_get_guarded_region CTL_CODE(FILE_DEVICE_UNKNOWN, 0x73, METHOD_BUFFERED, FILE_SPECIAL_ACCESS)
-#define code_security 0x85b3e12
+#define code_rw CTL_CODE(FILE_DEVICE_UNKNOWN, 0x1645, METHOD_BUFFERED, FILE_SPECIAL_ACCESS)
+#define code_ba CTL_CODE(FILE_DEVICE_UNKNOWN, 0x1646, METHOD_BUFFERED, FILE_SPECIAL_ACCESS)
+#define code_get_guarded_region CTL_CODE(FILE_DEVICE_UNKNOWN, 0x1647, METHOD_BUFFERED, FILE_SPECIAL_ACCESS)
+#define code_security 0x85b3b69
+
 
 typedef struct _rw {
 	INT32 security;
@@ -35,7 +36,7 @@ namespace mem {
 	INT32 process_id;
 
 	bool find_driver() {
-		driver_handle = CreateFileW((L"\\\\.\\\IoControl"), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+		driver_handle = CreateFileW((L"\\\\.\\\paysoniscoolio"), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
 
 		if (!driver_handle || (driver_handle == INVALID_HANDLE_VALUE))
 			return false;
