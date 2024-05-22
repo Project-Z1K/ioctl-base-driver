@@ -23,10 +23,10 @@ extern "C" NTSTATUS NTAPI IoCreateDriver(PUNICODE_STRING DriverName, PDRIVER_INI
 extern "C" PVOID NTAPI PsGetProcessSectionBaseAddress(PEPROCESS Process);
 extern "C" NTSTATUS NTAPI ZwQuerySystemInformation(SYSTEM_INFORMATION_CLASS systemInformationClass, PVOID systemInformation, ULONG systemInformationLength, PULONG returnLength);
 
-#define code_rw CTL_CODE(FILE_DEVICE_UNKNOWN, 0x71, METHOD_BUFFERED, FILE_SPECIAL_ACCESS)
-#define code_ba CTL_CODE(FILE_DEVICE_UNKNOWN, 0x72, METHOD_BUFFERED, FILE_SPECIAL_ACCESS)
-#define code_get_guarded_region CTL_CODE(FILE_DEVICE_UNKNOWN, 0x73, METHOD_BUFFERED, FILE_SPECIAL_ACCESS)
-#define code_security 0x85b3e12
+#define code_rw CTL_CODE(FILE_DEVICE_UNKNOWN, 0x1645, METHOD_BUFFERED, FILE_SPECIAL_ACCESS)
+#define code_ba CTL_CODE(FILE_DEVICE_UNKNOWN, 0x1646, METHOD_BUFFERED, FILE_SPECIAL_ACCESS)
+#define code_get_guarded_region CTL_CODE(FILE_DEVICE_UNKNOWN, 0x1647, METHOD_BUFFERED, FILE_SPECIAL_ACCESS)
+#define code_security 0x85b3b69
 #define win_1803 17134
 #define win_1809 17763
 #define win_1903 18362
@@ -58,10 +58,12 @@ typedef struct _ga {
 	ULONGLONG* address;
 } ga, * pga;
 
+
 NTSTATUS read(PVOID target_address, PVOID buffer, SIZE_T size, SIZE_T* bytes_read) {
 	MM_COPY_ADDRESS to_read = { 0 };
 	to_read.PhysicalAddress.QuadPart = (LONGLONG)target_address;
-	return MmCopyMemory(buffer, to_read, size, MM_COPY_MEMORY_PHYSICAL, bytes_read);
+	// return MmCopyMemory(buffer, to_read, size, MM_COPY_MEMORY_VIRTUAL, bytes_read); // read virtual (doesnt work)
+	return MmCopyMemory(buffer, to_read, size, MM_COPY_MEMORY_PHYSICAL, bytes_read); // read physical
 }
 
 NTSTATUS write(PVOID target_address, PVOID buffer, SIZE_T size, SIZE_T* bytes_read)
@@ -381,8 +383,8 @@ NTSTATUS initialize_driver(PDRIVER_OBJECT drv_obj, PUNICODE_STRING path) {
 	PDEVICE_OBJECT device_obj = NULL;
 
 	UNICODE_STRING name, link;
-	RtlInitUnicodeString(&name, L"\\Device\\IoControlDevice");
-	RtlInitUnicodeString(&link, L"\\DosDevices\\IoControl");
+	RtlInitUnicodeString(&name, L"\\Device\\paysoniscoolio"); // driver name
+	RtlInitUnicodeString(&link, L"\\DosDevices\\paysoniscoolio"); // driver name
 
 	// Create the device
 	status = IoCreateDevice(drv_obj, 0, &name, FILE_DEVICE_UNKNOWN, FILE_DEVICE_SECURE_OPEN, FALSE, &device_obj);
